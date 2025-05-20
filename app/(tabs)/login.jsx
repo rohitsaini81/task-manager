@@ -31,7 +31,7 @@ const uri = 'http://127.0.0.1:3000/api/auth/login'
         console.log(response)
         await AsyncStorage.setItem('sessionId', data.sessionId);
         await AsyncStorage.setItem('user', JSON.stringify(data.user));
-        // router.push('/home'); // Redirect after login
+        router.push('/home'); // Redirect after login
         console.log(data)
       } else {
         Alert.alert('Login Failed', data?.message || 'Invalid credentials');

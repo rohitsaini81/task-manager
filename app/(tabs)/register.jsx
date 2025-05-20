@@ -25,7 +25,8 @@ export default function Register() {
 
       const data = await response.json();
 
-      if (response) {
+      
+      if (response.ok) {
         Alert.alert('Success', 'OTP Sent Successfully!');
         router.push({
           pathname: '/VerifyOTP',
@@ -35,8 +36,8 @@ export default function Register() {
         Alert.alert('OTP Send Failed', data?.message || 'Please try again');
       }
     } catch (error) {
+      Alert.alert(error.message || 'Something went wrong');
       console.error(error);
-      Alert.alert('Error', 'Something went wrong');
     }
   };
 

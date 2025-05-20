@@ -1,5 +1,3 @@
-// app/index.jsx
-
 import { View, Text, Button, StyleSheet, TextInput, TouchableOpacity, Animated } from 'react-native';
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'expo-router';
@@ -19,7 +17,7 @@ export default function HomeScreen() {
   }, []);
 
   return (
-    <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
+    <Animated.View style={[styles.container, { opacity: fadeAnim }]}>      
       <Text style={styles.title}>Welcome to Task Manager 👋</Text>
 
       <TouchableOpacity style={styles.button} onPress={() => router.push('/login')}>
@@ -50,7 +48,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1e1e1e',
+    backgroundColor: 'white',
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
@@ -58,7 +56,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     marginBottom: 40,
-    color: '#fff',
+    color: '#4A3AFF',
     fontWeight: 'bold',
   },
   button: {

@@ -10,7 +10,33 @@ export default function Login() {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
-const uri = 'http://127.0.0.1:3000/api/auth/login'
+const uri = 'http://127.0.0.1:3000/api/auth/'
+
+const isLoggedIn = async () => {
+  try {
+    const sessionId = await AsyncStorage.getItem('sessionId');
+    const user = await AsyncStorage.getItem('user');
+    if (sessionId && user) {
+      const parsedUser = JSON.parse(user);
+      if (parsedUser.Verified_status) {
+        router.push('/homepage'); // Redirect to homepage if user is verified
+      } else {
+        // console.log(parsedUser);
+        router.push('/home'); // Redirect to home if user is not verified
+      }
+    } 
+  } catch (error) {
+    console.error('Error checking login status:', error);
+  }
+};
+  // Call isLoggedIn when the component mounts
+  React.useEffect(() => {
+    isLoggedIn();
+  }
+  , []);
+
+
+
   const handleLogin = async () => {
     if (!phone || !password) {
       Alert.alert('Error', 'Please fill all fields');
@@ -18,7 +44,7 @@ const uri = 'http://127.0.0.1:3000/api/auth/login'
     }
 
     try {
-      const response = await fetch(uri, {
+      const response = await fetch(uri+"login", {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone, password }),
@@ -31,6 +57,9 @@ const uri = 'http://127.0.0.1:3000/api/auth/login'
         console.log(response)
         await AsyncStorage.setItem('sessionId', data.sessionId);
         await AsyncStorage.setItem('user', JSON.stringify(data.user));
+        if(data.user.Verified_status){
+          router.push('/homepage'); // Redirect after login
+        }
         router.push('/home'); // Redirect after login
         console.log(data)
       } else {

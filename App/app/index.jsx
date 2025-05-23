@@ -1,14 +1,35 @@
 import { View, Text, Button, StyleSheet, TextInput, TouchableOpacity, Animated } from 'react-native';
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'expo-router';
+import { isLoggedIn } from './(tabs)/login';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function HomeScreen() {
   const router = useRouter();
   const [projectId, setProjectId] = useState('');
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
+  const isLoggedIn = async () => {
+    try {
+      const sessionId = await AsyncStorage.getItem('sessionId');
+      const user = await AsyncStorage.getItem('user');
+      if (sessionId && user) {
+        const parsedUser = JSON.parse(user);
+        if (parsedUser.Verified_status) {
+          router.push('/homepage'); // Redirect to homepage if user is verified
+        } else {
+          router.push('/home'); // Redirect to home if user is not verified
+        }
+      } 
+    } catch (error) {
+      console.error('Error checking login status:', error);
+    }
+  };
   // Animate on load
   useEffect(() => {
+
+isLoggedIn();
+
     Animated.timing(fadeAnim, {
       toValue: 1,
       duration: 1000,

@@ -1,5 +1,6 @@
 import { router } from "expo-router";
 import React, { useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   View,
   Text,
@@ -12,8 +13,7 @@ import {
   Animated,
 } from "react-native";
 import { Plus, Menu, X, MoreVertical } from "react-native-feather";
-import { TouchableWithoutFeedback } from "react-native-web";
-
+import { TouchableWithoutFeedback } from "react-native";
 const projects = [
   {
     id: 1,
@@ -29,6 +29,36 @@ const projects = [
 ];
 
 export default function Homepage() {
+  const getProjects = async () => {
+    try {
+      const sessionId = await AsyncStorage.getItem('sessionId');
+      const response = await fetch('http://127.0.0.1:3000/api/project/all', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${sessionId}`,
+        },
+      });
+      const data = await response.json();
+      if (response.ok) {
+        console.log(data.projects)
+        data.projects.map((project) => {
+          const pro ={
+            "id": project._id,
+            "title": project.projectName,
+            "description": project.projectDescription? project.projectDescription: "No description available",
+          }
+   setProjectList((prev) => [...prev, pro])
+  console.log(project)
+        })
+      } else {
+        console.error('Error fetching projects:', data.message);
+      }
+       
+    } catch (error) {
+      console.error('Error checking login status:', error);
+    }
+  };
   const [isModalVisible, setModalVisible] = useState(false);
   const [newProject, setNewProject] = useState({ title: "", description: "" });
   const [projectList, setProjectList] = useState(projects);
@@ -79,6 +109,23 @@ export default function Homepage() {
 
   }
 
+  React.useEffect(() => {
+    const checkLoginStatus = async () => {
+      try {
+        const sessionId = await AsyncStorage.getItem('sessionId');
+        if (!sessionId) {
+          router.push('/login');
+        } else {
+          getProjects();
+        }
+      } catch (error) {
+        console.error('Error checking login status:', error);
+      }
+    };
+
+    checkLoginStatus();
+  }
+  , []);
   return (
     <TouchableWithoutFeedback onPress={closeMenu}>
       <View style={styles.container}>
@@ -124,14 +171,14 @@ export default function Homepage() {
                                 </TouchableOpacity>
                                 {menuProjectId === project.id && (
                                     <View style={styles.projectMenu}>
-                                        <TouchableOpacity onPress={() => alert('Rename not implemented yet')}><Text style={styles.menuOption}>Rename</Text></TouchableOpacity>
-                                        <TouchableOpacity onPress={() => alert('Settings not implemented yet')}><Text style={styles.menuOption}>Settings</Text></TouchableOpacity>
+                                        <TouchableOpacity onPress={() => alert('Rename not implemented yet')}><Text style={styles.menuOption}>Edit</Text></TouchableOpacity>
                                         <TouchableOpacity onPress={() => deleteProject(project.id)}><Text style={styles.menuOption}>Delete</Text></TouchableOpacity>
                                     </View>
                                 )}
 
                             </View>
                             <Text style={styles.cardDescription}>{project.description}</Text>
+
                         </View>
                     ))}
                 </ScrollView>
@@ -152,8 +199,10 @@ export default function Homepage() {
         >
           <View style={styles.modalOverlay}>
             <View style={styles.modalContainer}>
-              <Text style={styles.modalTitle}>Add New Project</Text>
-              <TextInput
+             <Text style={styles.modalTitle}>Add New Project</Text>
+
+
+<TextInput
                 placeholder="Project Title"
                 value={newProject.title}
                 onChangeText={(text) =>
@@ -161,7 +210,8 @@ export default function Homepage() {
                 }
                 style={styles.input}
               />
-              <TextInput
+
+<TextInput
                 placeholder="Project Description"
                 value={newProject.description}
                 onChangeText={(text) =>
@@ -177,7 +227,8 @@ export default function Homepage() {
                 onPress={() => setModalVisible(false)}
                 style={styles.closeButton}
               >
-                <Text style={styles.closeButtonText}>Cancel</Text>
+<Text style={styles.closeButtonText}>Cancel</Text>
+
               </TouchableOpacity>
             </View>
           </View>
@@ -344,8 +395,8 @@ cardDescription: {
 },
 projectMenu: {
     position: 'absolute',
-    top: 15,
-    right: 0,
+    top: -8,
+    right: 30,
     backgroundColor: '#ECEBFF',
     borderRadius: 8,
     padding: 8,

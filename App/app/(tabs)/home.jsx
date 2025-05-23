@@ -30,6 +30,9 @@ export default function Home() {
         //   router.push("/login")
         throw new Error(data.message || 'Failed to fetch user data');
       }
+      if(data.user.Verified_status){
+        router.push("/homepage")
+      }
 
       setUser(data.user);
       console.log(data)
@@ -57,7 +60,7 @@ export default function Home() {
     <View style={styles.container}>
       <Text style={styles.title}>Welcome, {user?.username || 'User'}!</Text>
       <Text style={styles.info}>Mobile: {user?.phone}</Text>
-      <Text style={styles.info}>Verified: {user?.isVerified ? 'Yes' : 'No'}</Text>
+      <Text style={styles.info}>Verified: {user?.Verified_status ? 'Yes' : 'No'}</Text>
     </View>
   );
 }

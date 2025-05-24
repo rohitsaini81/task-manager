@@ -10,7 +10,7 @@ const projectSchema = new mongoose.Schema({
     projectMembers: { type: Array, required: false },
     projectTasks: { type: Array, required: false },
     projectFiles: { type: Array, required: false },
-    projectComments: { type: Array, required: false },
+    projectThreads: { type: Array, required: false },
     projectCreatedAt: { type: Date, default: Date.now },
     projectUpdatedAt: { type: Date, default: Date.now },
     projectDeletedAt: { type: Date, default: null },

@@ -25,7 +25,7 @@ thread.post('/create/:projectId', async (req, res) => {
         if (!project || !user) {
             return res.status(404).json({ message: 'Project or user not found' });
         }
-        const newThread = new Thread({
+        const newThread =await Thread.create({
             projectId,
             userId,
             content,
@@ -33,8 +33,7 @@ thread.post('/create/:projectId', async (req, res) => {
             title,
             createdAt: new Date(),
         });
-        await newThread.save();
-        project.threads.push(newThread._id);
+        project.projectThreads.push(newThread._id);
         await project.save();
         res.status(201).json(newThread);
     } catch (error) {

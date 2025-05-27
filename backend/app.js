@@ -21,11 +21,11 @@ app.get('/', (req, res) => {
 });
 import developmentRoutes from './routes/developmentRoutes.js';
 import project from './routes/projRoutes.js';
-import thread from './routes/threadRoutes.js';
+import task from './routes/taskRoutes.js';
 
 app.use('/api/auth', authRoutes);
 app.use('/api/project',project)
-app.use('/api/thread',thread)
+app.use('/api/task',task)
 app.use(developmentRoutes);
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT} 🔥`));

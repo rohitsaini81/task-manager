@@ -10,4 +10,5 @@ const taskSchema = new mongoose.Schema({
 
 }, { timestamps: true });
 
-export const Thread = mongoose.model('task-manager-tasks', taskSchema);
+ const Task = mongoose.model('task-manager-tasks', taskSchema);
+export default Task;

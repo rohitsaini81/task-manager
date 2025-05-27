@@ -31,32 +31,33 @@ const projects = [
 export default function Homepage() {
   const getProjects = async () => {
     try {
-      const sessionId = await AsyncStorage.getItem('sessionId');
-      const response = await fetch('http://127.0.0.1:3000/api/project/all', {
-        method: 'GET',
+      const sessionId = await AsyncStorage.getItem("sessionId");
+      const response = await fetch("http://127.0.0.1:3000/api/project/all", {
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${sessionId}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionId}`,
         },
       });
       const data = await response.json();
       if (response.ok) {
-        console.log(data.projects)
+        console.log(data.projects);
         data.projects.map((project) => {
-          const pro ={
-            "id": project._id,
-            "title": project.projectName,
-            "description": project.projectDescription? project.projectDescription: "No description available",
-          }
-   setProjectList((prev) => [...prev, pro])
-  console.log(project)
-        })
+          const pro = {
+            id: project._id,
+            title: project.projectName,
+            description: project.projectDescription
+              ? project.projectDescription
+              : "No description available",
+          };
+          setProjectList((prev) => [...prev, pro]);
+          console.log(project);
+        });
       } else {
-        console.error('Error fetching projects:', data.message);
+        console.error("Error fetching projects:", data.message);
       }
-       
     } catch (error) {
-      console.error('Error checking login status:', error);
+      console.error("Error checking login status:", error);
     }
   };
   const [isModalVisible, setModalVisible] = useState(false);
@@ -65,18 +66,16 @@ export default function Homepage() {
   const [isMenuOpen, setMenuOpen] = useState(false);
   const slideAnim = useState(new Animated.Value(-250))[0];
 
-
   const [activeProject, setActiveProject] = useState(null);
   const [menuProjectId, setMenuProjectId] = useState(null);
 
   const toggleProjectMenu = (projectId) => {
     setMenuProjectId(menuProjectId === projectId ? null : projectId);
-};
+  };
   const deleteProject = (projectId) => {
     setProjectList(projectList.filter((project) => project.id !== projectId));
     setMenuProjectId(null);
-};
-
+  };
 
   const addProject = () => {
     if (newProject.title && newProject.description) {
@@ -106,26 +105,24 @@ export default function Homepage() {
     // Handle logout logic here
     console.log("Logout");
     closeMenu();
-
-  }
+  };
 
   React.useEffect(() => {
     const checkLoginStatus = async () => {
       try {
-        const sessionId = await AsyncStorage.getItem('sessionId');
+        const sessionId = await AsyncStorage.getItem("sessionId");
         if (!sessionId) {
-          router.push('/login');
+          router.push("/login");
         } else {
           getProjects();
         }
       } catch (error) {
-        console.error('Error checking login status:', error);
+        console.error("Error checking login status:", error);
       }
     };
 
     checkLoginStatus();
-  }
-  , []);
+  }, []);
   return (
     <TouchableWithoutFeedback onPress={closeMenu}>
       <View style={styles.container}>
@@ -152,7 +149,9 @@ export default function Homepage() {
           </TouchableOpacity>
           <Text style={styles.menuItem}>Settings</Text>
           <Text style={styles.menuItem}>Profile</Text>
-          <Text onPress={Logout} style={styles.menuItem}>Logout</Text>
+          <Text onPress={Logout} style={styles.menuItem}>
+            Logout
+          </Text>
         </Animated.View>
 
         {/* Title */}
@@ -160,28 +159,40 @@ export default function Homepage() {
 
         {/* Projects List */}
         <ScrollView contentContainerStyle={styles.projectList}>
-                    {projectList.map((project) => (
-                        <View key={project.id} style={styles.card}>
-                            <View style={styles.cardHeader}>
-                              <TouchableOpacity onPress={()=>router.push(`/project/${project.id}`)}>  <Text style={styles.cardTitle}>{project.title}</Text></TouchableOpacity>
-                                
+          {projectList.map((project) => (
+            <View key={project.id} style={styles.card}>
+              <View style={styles.cardHeader}>
+                <TouchableOpacity
+                  onPress={() => router.push(`/project/${project.id}`)}
+                >
+                  {" "}
+                  <Text style={styles.cardTitle}>{project.title}</Text>
+                </TouchableOpacity>
 
-                                <TouchableOpacity style={styles.moreButton} onPress={() => toggleProjectMenu(project.id)}>
-                                    <MoreVertical stroke='#6C63FF' width={24} height={24} />
-                                </TouchableOpacity>
-                                {menuProjectId === project.id && (
-                                    <View style={styles.projectMenu}>
-                                        <TouchableOpacity onPress={() => alert('Rename not implemented yet')}><Text style={styles.menuOption}>Edit</Text></TouchableOpacity>
-                                        <TouchableOpacity onPress={() => deleteProject(project.id)}><Text style={styles.menuOption}>Delete</Text></TouchableOpacity>
-                                    </View>
-                                )}
+                <TouchableOpacity
+                  style={styles.moreButton}
+                  onPress={() => toggleProjectMenu(project.id)}
+                >
+                  <MoreVertical stroke="#6C63FF" width={24} height={24} />
+                </TouchableOpacity>
+                {menuProjectId === project.id && (
+                  <View style={styles.projectMenu}>
+                    <TouchableOpacity
+                      onPress={() => alert("Edit not implemented yet")}
+                    >
+                      <Text style={styles.menuOption}>Edit</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => deleteProject(project.id)}>
+                      <Text style={styles.menuOption}>Delete</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </View>
+              <Text style={styles.cardDescription}>{project.description}</Text>
+            </View>
+          ))}
+        </ScrollView>
 
-                            </View>
-                            <Text style={styles.cardDescription}>{project.description}</Text>
-
-                        </View>
-                    ))}
-                </ScrollView>
 
         {/* Floating Action Button */}
         <TouchableOpacity
@@ -199,10 +210,9 @@ export default function Homepage() {
         >
           <View style={styles.modalOverlay}>
             <View style={styles.modalContainer}>
-             <Text style={styles.modalTitle}>Add New Project</Text>
+              <Text style={styles.modalTitle}>Add New Project</Text>
 
-
-<TextInput
+              <TextInput
                 placeholder="Project Title"
                 value={newProject.title}
                 onChangeText={(text) =>
@@ -211,7 +221,7 @@ export default function Homepage() {
                 style={styles.input}
               />
 
-<TextInput
+              <TextInput
                 placeholder="Project Description"
                 value={newProject.description}
                 onChangeText={(text) =>
@@ -227,8 +237,7 @@ export default function Homepage() {
                 onPress={() => setModalVisible(false)}
                 style={styles.closeButton}
               >
-<Text style={styles.closeButtonText}>Cancel</Text>
-
+                <Text style={styles.closeButtonText}>Cancel</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -279,10 +288,10 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   menuItem: {
-    color: 'white',
+    color: "white",
     fontSize: 18,
     marginBottom: 20,
-},
+  },
   title: {
     fontSize: 32,
     fontWeight: "bold",
@@ -293,37 +302,36 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   card: {
-    backgroundColor: '#F4F2FF',
+    backgroundColor: "#F4F2FF",
     borderRadius: 16,
     padding: 16,
     marginBottom: 16,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 4,
-},
-cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  },
+  cardHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 8,
-},
-cardTitle: {
+  },
+  cardTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#6C63FF',
-},
-moreButton: {
+    fontWeight: "bold",
+    color: "#6C63FF",
+  },
+  moreButton: {
     padding: 4,
     borderRadius: 8,
-    backgroundColor: '#ECEBFF',
-},
-cardDescription: {
+    backgroundColor: "#ECEBFF",
+  },
+  cardDescription: {
     fontSize: 16,
-    color: '#666',
-}
-,
+    color: "#666",
+  },
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.5)",
@@ -387,28 +395,26 @@ cardDescription: {
     elevation: 4,
   },
 
-
-
   cardWrapper: {
-    position: 'relative',
+    position: "relative",
     zIndex: 2,
-},
-projectMenu: {
-    position: 'absolute',
+  },
+  projectMenu: {
+    position: "absolute",
     top: -8,
     right: 30,
-    backgroundColor: '#ECEBFF',
+    backgroundColor: "#ECEBFF",
     borderRadius: 8,
     padding: 8,
     zIndex: 999,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
-},
-menuOption: {
+  },
+  menuOption: {
     paddingHorizontal: 16,
-    color: '#6C63FF',
+    color: "#6C63FF",
     fontSize: 16,
-}
+  },
 });

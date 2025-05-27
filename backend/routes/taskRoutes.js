@@ -44,5 +44,24 @@ thread.post('/create/:projectId', async (req, res) => {
 );
 
 
+thread.get('/list/:projectId',async(req, res) => {
+
+    const { projectId } = req.params;
+    // Validate projectId
+    if (!projectId) {
+        return res.status(400).json({ message: 'Project ID is required' });
+    }
+    try {
+        const threads = await Thread.find({ projectId })
+        if (!threads || threads.length === 0) {
+            return res.status(404).json({ message: 'threads not found' });
+        }
+        res.status(200).json(threads);
+    } catch (error) {
+        console.error('Error fetching threads:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+}
+);
 
 export default thread;

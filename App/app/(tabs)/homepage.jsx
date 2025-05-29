@@ -133,7 +133,7 @@ export default function Homepage() {
           </TouchableOpacity>
           <TouchableOpacity>
             <Image
-              source={{ uri: "https://via.placeholder.com/40" }}
+              source={{ uri: "https://akm-img-a-in.tosshub.com/sites/visualstory/stories/2022_11/story_13115/assets/4.jpeg?time=1668443770" }}
               style={styles.profileImage}
             />
           </TouchableOpacity>

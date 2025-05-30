@@ -50,6 +50,7 @@ const deleteTask = async (req, res) => {
   try {
 
     const project = req.body;
+    console.log("Project data:", project);
     if (!project.projectId) {
       return res.status(400).json({ error: "Project ID is required" });
     }

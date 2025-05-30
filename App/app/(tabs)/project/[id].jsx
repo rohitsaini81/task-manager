@@ -25,7 +25,7 @@ import {
   MoreVertical,
   Plus,
 } from "react-native-feather";
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DateTimePicker from "@react-native-community/datetimepicker";
 import useStore from "../../store/Store";
 
 export default function CommentSection() {
@@ -68,24 +68,19 @@ export default function CommentSection() {
   };
 
   const addTask = async () => {
-    console.log("oh")
     if (!newTask.title || !newTask.content) return;
     const task = {
       ...newTask,
       projectId: id,
       dueDate: date.toISOString(),
-
-
     };
-    
-    console.log(task)
 
-  const sessionId = await AsyncStorage.getItem("sessionId");
+    const sessionId = await AsyncStorage.getItem("sessionId");
     if (!sessionId) {
       alert("Please login to add a task");
       return router.push("/login");
     }
-    const response = await fetch (main_uri+"/project/create", {
+    const response = await fetch(main_uri + "task/create", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -98,7 +93,9 @@ export default function CommentSection() {
       return;
     }
 
-    setTasks([...tasks, task]);
+    const createdTask = await response.json();
+
+    setTasks([...tasks, createdTask]);
     setNewTask({ title: "", content: "" });
     setTaskModalVisible(false);
   };
@@ -116,6 +113,7 @@ export default function CommentSection() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${sessionId}`,
         },
+        body: JSON.stringify({ projectId: id }),
       });
       if (!response.ok) throw new Error("Failed to delete task");
       setTasks(tasks.filter((task) => task._id !== taskId));
@@ -127,20 +125,77 @@ export default function CommentSection() {
     }
   };
 
-  const addComment = () => {
-    if (!newComment.user || !newComment.text) return;
-    setComments([...comments, { ...newComment, id: comments.length + 1 }]);
-    setNewComment({ user: "", text: "" });
-    setCommentModalVisible(false);
+  const [currentTask, setCurrentTask] = useState(null);
+
+  const fetchComments = async () => {
+    try {
+      if (!currentTask) return;
+      const sessionId = await AsyncStorage.getItem("sessionId");
+      const response = await fetch(
+        `${main_uri}comment/all/${currentTask._id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${sessionId}`,
+          },
+        }
+      );
+      if (!response.ok) throw new Error("Failed to fetch comments");
+      const data = await response.json();
+      setComments(data);
+      console.log(data)
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+      alert("Failed to fetch comments");
+    }
   };
 
+
+  const addComment = async () => 
+  {
+    try{
+      if (!newComment.user || !newComment.text || !currentTask) return;
+      const comment = {
+        projectId: id,
+        content: newComment.text,
+        taskId: currentTask._id,
+      };
+
+      const sessionId = await AsyncStorage.getItem("sessionId");
+      if (!sessionId) {
+        alert("Please login to add a comment");
+        return router.push("/login");
+      }
+      const response = await fetch(main_uri + "comment/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionId}`,
+        },
+        body: JSON.stringify(comment),
+      });
+      if (!response.ok) throw new Error("Failed to add comment");
+
+      const createdComment = await response.json();
+      console.log(createdComment)
+      setComments([...comments, createdComment]);
+      setNewComment("");
+    }
+    catch (error) {
+      console.error("Error adding comment:", error);
+      alert("Failed to add comment");
+    } finally {
+      setCurrentTask(null);
+    }
+  }
   const onChangeDate = (event, selectedDate) => {
     setShowDatePicker(false);
     if (selectedDate) setDate(selectedDate);
   };
 
   const toggleTaskMenu = (taskId) => {
-    setMenuTaskId(menuTaskId === taskId ? null : taskId);
+    setMenuTaskId((prevId) => (prevId === taskId ? null : taskId));
   };
 
   return (
@@ -159,7 +214,9 @@ export default function CommentSection() {
           {project ? `Project: ${project.projectName}` : "Loading..."}
         </Text>
         {project && (
-          <Text style={styles.projectDescription}>{project.projectDescription}</Text>
+          <Text style={styles.projectDescription}>
+            {project.projectDescription}
+          </Text>
         )}
       </View>
 
@@ -167,26 +224,46 @@ export default function CommentSection() {
       <ScrollView contentContainerStyle={styles.commentList}>
         {tasks.map((task) => (
           <View key={task._id || task.id} style={styles.commentCard}>
-            <Text style={styles.commentUser}>Task ID: {task._id || task.id}</Text>
+            <Text style={styles.commentUser}>
+              Task ID: {task._id || task.id}
+            </Text>
             <Text style={styles.commentText}>{task.title || task.content}</Text>
-            <Text style={styles.commentText}>Due Date: {task.dueDate || "Not set"}</Text>
+            <Text style={styles.commentText}>
+              Due Date: {task.dueDate || "Not set"}
+            </Text>
             <View style={[styles.flex, styles.p40]}>
-              <TouchableOpacity style={styles.items} onPress={() => alert("Like")}>
+              <TouchableOpacity
+                style={styles.items}
+                onPress={() => alert("Like")}
+              >
                 <Text>👍 70%</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.items} onPress={() => alert("2 days left")}>
+              <TouchableOpacity
+                style={styles.items}
+                onPress={() => alert("2 days left")}
+              >
                 <Clock stroke="orange" width={24} height={24} />
               </TouchableOpacity>
-              <TouchableOpacity style={styles.moreButton} onPress={() => toggleTaskMenu(task._id)}>
+              <TouchableOpacity
+                style={styles.moreButton}
+                onPress={() => toggleTaskMenu(task._id)}
+              >
                 <MoreVertical stroke="#6C63FF" width={24} height={24} />
               </TouchableOpacity>
-              <TouchableOpacity style={styles.items} onPress={() => setCommentModalVisible(true)}>
+              <TouchableOpacity
+                style={styles.items}
+                onPress={async () => {
+                  await setCurrentTask(task);
+                  await fetchComments()
+                  setCommentModalVisible(true);
+                }}
+              >
                 <MessageCircle stroke="gray" width={24} height={24} />
               </TouchableOpacity>
             </View>
             {menuTaskId === task._id && (
               <View style={styles.projectMenu}>
-                <TouchableOpacity onPress={() => alert("Edit not implemented")}>              
+                <TouchableOpacity onPress={() => alert("Edit not implemented")}>
                   <Text style={styles.menuOption}>Edit</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => deleteTask(task._id)}>
@@ -199,7 +276,10 @@ export default function CommentSection() {
       </ScrollView>
 
       {/* Floating Action Button */}
-      <TouchableOpacity style={styles.fab} onPress={() => setTaskModalVisible(true)}>
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={() => setTaskModalVisible(true)}
+      >
         <Plus stroke="white" width={28} height={28} />
       </TouchableOpacity>
 
@@ -234,7 +314,10 @@ export default function CommentSection() {
             <TouchableOpacity style={styles.addButton} onPress={addTask}>
               <Text style={styles.addButtonText}>Add New Task</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => setTaskModalVisible(false)} style={styles.closeButton}>
+            <TouchableOpacity
+              onPress={() => setTaskModalVisible(false)}
+              style={styles.closeButton}
+            >
               <Text style={styles.closeButtonText}>Cancel</Text>
             </TouchableOpacity>
           </View>
@@ -246,29 +329,36 @@ export default function CommentSection() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
             <Text style={styles.modalTitle}>Add New Comment 💡</Text>
-            <TextInput
+            {/* <TextInput
               placeholder="Your Name"
               value={newComment.user}
-              onChangeText={(text) => setNewComment({ ...newComment, user: text })}
+              onChangeText={(text) =>
+                setNewComment({ ...newComment, user: text })
+              }
               style={styles.input}
-            />
+            /> */}
             <TextInput
               placeholder="Share Your Idea"
               value={newComment.text}
-              onChangeText={(text) => setNewComment({ ...newComment, text: text })}
+              onChangeText={(text) =>
+                setNewComment({ ...newComment, text: text })
+              }
               style={styles.input}
             />
             <TouchableOpacity style={styles.addButton} onPress={addComment}>
               <Text style={styles.addButtonText}>Add Comment</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => setCommentModalVisible(false)} style={styles.closeButton}>
+            <TouchableOpacity
+              onPress={() => setCommentModalVisible(false)}
+              style={styles.closeButton}
+            >
               <Text style={styles.closeButtonText}>Cancel</Text>
             </TouchableOpacity>
             <ScrollView>
               {comments.map((comment) => (
-                <View key={comment.id} style={styles.commentCard}>
-                  <Text style={styles.commentUser}>{comment.user}</Text>
-                  <Text style={styles.commentText}>{comment.text}</Text>
+                <View key={comment._id} style={styles.commentCard}>
+                  <Text style={styles.commentUser}>{comment.createdBy}</Text>
+                  <Text style={styles.commentText}>{comment.content}</Text>
                 </View>
               ))}
             </ScrollView>
@@ -364,8 +454,8 @@ const styles = StyleSheet.create({
   },
   projectMenu: {
     position: "absolute",
-    top: 200,
-    right: 70,
+    top: 40,
+    right: 10,
     backgroundColor: "#FFF",
     borderRadius: 8,
     shadowColor: "#000",
@@ -373,6 +463,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 3,
     padding: 8,
+    zIndex: 10, // Ensure it's above other elements
   },
 
   //  floating action button styles and modal styles

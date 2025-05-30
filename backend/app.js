@@ -22,10 +22,12 @@ app.get('/', (req, res) => {
 import developmentRoutes from './routes/developmentRoutes.js';
 import project from './routes/projRoutes.js';
 import task from './routes/taskRoutes.js';
+import commRouter from './routes/commRoutes.js';
 
 app.use('/api/auth', authRoutes);
 app.use('/api/project',project)
 app.use('/api/task',task)
+app.use('/api/comment', commRouter)
 app.use(developmentRoutes);
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT} 🔥`));

@@ -1,14 +1,13 @@
 import mongoose from 'mongoose';
 
-const threadSchema = new mongoose.Schema({
-    userId:{ type: String, required: false },
+const commentSchema = new mongoose.Schema({
+    createdBy: { type: String, required: true },
+    taskId: { type: String, required: true },
     projectId: { type: String, required: true },
     content: { type: String, required: true },
-    type: { type: String, required: true },
-    threadMembers: { type: Array, required: false },
-    threadFiles: { type: Array, required: false },
     createdAt: { type: Date, default: Date.now },
 
 }, { timestamps: true });
 
-export const Thread = mongoose.model('task-manager-comments', threadSchema);
+ const Comment = mongoose.model('task-manager-comments', commentSchema);
+export default Comment;

@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
+import useStore from "../store/Store.js"; // Adjust the import path as necessary
 
 export default function Home() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { server, count, increase, decrease, reset } = useStore();
 
   const fetchUserData = async () => {
     try {
@@ -17,7 +19,7 @@ export default function Home() {
         return;
       }
 
-      const response = await fetch('http://127.0.0.1:3000/api/auth/verify', {
+      const response = await fetch(`${server}auth/verify`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${sessionId}`,

@@ -1,12 +1,24 @@
 import Task from "../models/Tasks.js";
 import Project from "../models/Project.js";
 import { verifyToken } from "../controllers/authController.js"; // Assuming you have a utility function to verify JWT tokens
+import { User } from "../models/User.js";
 const createTask = async (req, res) => {
   try {
     const user = verifyToken(req, res);
     if (!user) {
       return res.status(401).json({ error: "Unauthorized" });
     }
+
+    const userDetails = await User.findById(user.id);
+    if (!userDetails) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    const { username } = userDetails;
+    console.log(userDetails);
+
+
+
+
     const { projectId, title, content, dueDate } = req.body;
 
     // Validate input
@@ -27,11 +39,11 @@ const createTask = async (req, res) => {
         .json({ error: "Project not found or unauthorized" });
     }
     const createdBy = user.id;
-    // const username = user.username;
-    // Create task logic here (e.g., save to database)
+
     const newTask = {
       createdBy,
       projectId,
+      username,
       title,
       content,
       dueDate,
@@ -80,6 +92,10 @@ const deleteTask = async (req, res) => {
     if (!task || task.createdBy !== user.id) {
       return res.status(404).json({ error: "Task not found or unauthorized" });
     }
+
+
+    // TODO: Delete comments first if they exist
+
 
     // Delete the task
     await Task.deleteOne({ _id: taskId });

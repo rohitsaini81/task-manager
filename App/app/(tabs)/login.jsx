@@ -5,12 +5,15 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'reac
 import { Ionicons } from '@expo/vector-icons'; 
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import useStore from "../store/Store.js"; // Adjust the import path as necessary
 
 export default function Login() {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
-const uri = 'http://127.0.0.1:3000/api/auth/'
+  const { server } = useStore();
+
+const uri = `${server}auth/`
 
 const isLoggedIn = async () => {
   try {
@@ -70,15 +73,16 @@ const isLoggedIn = async () => {
       Alert.alert('Error', 'Something went wrong');
     }
   };
+  const [countryCode, setCountryCode] = useState('+91'); // default to India
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Welcome Back!</Text>
 
       <View style={styles.inputContainer}>
-        <Ionicons name="mail" size={24} color="#6200ee" style={styles.icon} />
+        <Ionicons name="call" size={24} color="#6200ee" style={styles.icon} />
         <TextInput
-          placeholder="phone"
+          placeholder="Phone"
           style={styles.input}
           keyboardType="phone"
           autoCapitalize="none"

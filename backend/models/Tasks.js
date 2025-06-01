@@ -1,7 +1,11 @@
 import mongoose from 'mongoose';
 
 const taskSchema = new mongoose.Schema({
-    createdBy:{ type: String, required: false },
+    createdBy:{ type: String, required: true },
+    username: {type: String, required:true},
+    members: { type: Array, required: false },
+    SuperMembers: { type: Array, required: false },
+    title: { type: String, required: true },
     projectId: { type: String, required: true },
     content: { type: String, required: true },
     type: { type: String, required: true },

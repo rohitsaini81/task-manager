@@ -14,25 +14,16 @@ import {
 } from "react-native";
 import { Plus, Menu, X, MoreVertical } from "react-native-feather";
 import { TouchableWithoutFeedback } from "react-native";
-const projects = [
-  {
-    id: 1,
-    title: "Project Alpha",
-    description: "Description for Project Alpha",
-  },
-  { id: 2, title: "Project Beta", description: "Description for Project Beta" },
-  {
-    id: 3,
-    title: "Project Gamma",
-    description: "Description for Project Gamma",
-  },
-];
+import useStore from "../store/Store.js"; // Adjust the import path as necessary
 
 export default function Homepage() {
+  const projects = [];
+  const { server, count, increase, decrease, reset } = useStore();
+
   const getProjects = async () => {
     try {
       const sessionId = await AsyncStorage.getItem("sessionId");
-      const response = await fetch("http://127.0.0.1:3000/api/project/all", {
+      const response = await fetch(`${server}project/all`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -72,13 +63,77 @@ export default function Homepage() {
   const toggleProjectMenu = (projectId) => {
     setMenuProjectId(menuProjectId === projectId ? null : projectId);
   };
-  const deleteProject = (projectId) => {
-    setProjectList(projectList.filter((project) => project.id !== projectId));
+  const deleteProject = async(projectId) => {
+
+    const sessionId = await AsyncStorage.getItem("sessionId");
+    if (!sessionId) {
+      console.error("No session ID found. Please log in.");
+      return;
+    }
+    const response = await fetch(`${server}project/delete/${projectId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sessionId}`,
+      },
+      body: JSON.stringify({ projectStatus: "deleted" }), // Assuming you want to mark it as deleted
+    });
+    if(!response.ok) {
+      console.error("Error deleting project:", response.statusText);
+      alert("Error deleting project: " + response.statusText);
+      setMenuProjectId(null);
+      return;
+    }
+
+    const output = response.json()
+    console.log(output)
+      setProjectList(projectList.filter((project) => project.id !== projectId));
     setMenuProjectId(null);
   };
 
-  const addProject = () => {
+  const addProject = async () => {
     if (newProject.title && newProject.description) {
+      const sessionId = await AsyncStorage.getItem("sessionId");
+      const obj = {
+        projectName: newProject.title,
+        projectDescription: newProject.description,
+        projectStatus: "active", // Default status, can be changed later
+      };
+      console.log(obj);
+      if (!sessionId) {
+        console.error("No session ID found. Please log in.");
+        return;
+      }
+      const response = await fetch(`${server}project/create`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionId}`,
+        },
+        body: JSON.stringify(obj),
+      });
+
+      const responseText = await response.text(); // Always safe
+      let data;
+
+
+      if (response.ok) {
+        // Show success popup
+        alert("Project created successfully!");
+        console.log("Project created successfully:", data);
+      } else {
+        alert("Error creating project: " + responseText);
+        console.error("Error creating project:", data.message);
+        return;
+      }      
+      try {
+        data = JSON.parse(responseText); // Try parsing manually
+      } catch (err) {
+        console.error("Failed to parse response as JSON:", responseText);
+        throw new Error("Invalid JSON response");
+        return;
+      }
+
       setProjectList([
         ...projectList,
         { ...newProject, id: projectList.length + 1 },
@@ -103,6 +158,10 @@ export default function Homepage() {
 
   const Logout = () => {
     // Handle logout logic here
+    AsyncStorage.removeItem("sessionId");
+    router.push("/login");
+    setProjectList([]);
+    setNewProject({ title: "", description: "" });
     console.log("Logout");
     closeMenu();
   };
@@ -133,7 +192,9 @@ export default function Homepage() {
           </TouchableOpacity>
           <TouchableOpacity>
             <Image
-              source={{ uri: "https://akm-img-a-in.tosshub.com/sites/visualstory/stories/2022_11/story_13115/assets/4.jpeg?time=1668443770" }}
+              source={{
+                uri: "https://akm-img-a-in.tosshub.com/sites/visualstory/stories/2022_11/story_13115/assets/4.jpeg?time=1668443770",
+              }}
               style={styles.profileImage}
             />
           </TouchableOpacity>
@@ -192,7 +253,6 @@ export default function Homepage() {
             </View>
           ))}
         </ScrollView>
-
 
         {/* Floating Action Button */}
         <TouchableOpacity

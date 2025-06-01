@@ -7,7 +7,7 @@ const createComment = async (req, res) => {
         if (!user) {
         return res.status(401).json({ error: "Unauthorized" });
         }
-        
+        console.log(user)
         const { taskId } = req.body;
         const { content } = req.body;
         const { projectId } = req.body;
@@ -28,6 +28,7 @@ const createComment = async (req, res) => {
         taskId: task._id,
         projectId: task.projectId,
         createdBy: user.id,
+        // username: user.username,
         createdAt: new Date(),
         };
 

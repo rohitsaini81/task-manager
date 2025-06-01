@@ -2,10 +2,12 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'reac
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { useLocalSearchParams } from 'expo-router';
+import useStore from "./store/Store.js"; // Adjust the import path as necessary
 
 export default function VerifyOTP() {
   const { phone } = useLocalSearchParams();
   const [otp, setOtp] = useState('');
+  const { server } = useStore();
 
   const verifyOtp = async () => {
     try {
@@ -14,7 +16,7 @@ export default function VerifyOTP() {
         return;
       }
 
-      const response = await fetch('http://localhost:3000/api/auth/verify/otp', {
+      const response = await fetch(`${server}auth/verify/otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone, otp })

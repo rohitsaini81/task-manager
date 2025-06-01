@@ -1,7 +1,3 @@
-// Your original code had several issues, including inconsistent naming, missing or incorrect state references,
-// broken logic in addTask and addComment, misuse of variables, missing data assignments, and some anti-patterns.
-// Below is a cleaned-up and fixed version of the core logic and structure. Styles are unchanged.
-
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useLocalSearchParams } from "expo-router";
 
@@ -24,12 +20,13 @@ import {
   MessageCircle,
   MoreVertical,
   Plus,
+  UserPlus,
 } from "react-native-feather";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import useStore from "../../store/Store";
 
 export default function CommentSection() {
-  const main_uri = "http://127.0.0.1:3000/api/";
+
   const { id } = useLocalSearchParams();
 
   const [project, setProject] = useState(null);
@@ -42,7 +39,7 @@ export default function CommentSection() {
   const [comments, setComments] = useState([]);
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const { count, increase, decrease, reset } = useStore();
+  const { server, count, increase, decrease, reset } = useStore();
   useEffect(() => {
     if (id) {
       getTasks(id);
@@ -52,7 +49,7 @@ export default function CommentSection() {
   const getTasks = async (projectId) => {
     try {
       const sessionId = await AsyncStorage.getItem("sessionId");
-      const response = await fetch(`${main_uri}task/${projectId}`, {
+      const response = await fetch(`${server}task/${projectId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -80,7 +77,7 @@ export default function CommentSection() {
       alert("Please login to add a task");
       return router.push("/login");
     }
-    const response = await fetch(main_uri + "task/create", {
+    const response = await fetch(server + "task/create", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -107,7 +104,7 @@ export default function CommentSection() {
         alert("Please login to delete the task");
         return router.push("/login");
       }
-      const response = await fetch(`${main_uri}task/${taskId}`, {
+      const response = await fetch(`${server}task/${taskId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -121,53 +118,61 @@ export default function CommentSection() {
     } catch (error) {
       console.error("Error deleting task:", error);
     } finally {
-      setMenuTaskId(null);
+      setMenuTaskId("");
     }
   };
 
-  const [currentTask, setCurrentTask] = useState(null);
+  const [currentTask, setCurrentTask] = useState({});
 
-  const fetchComments = async () => {
+  const fetchComments = async (taskId) => {
     try {
-      if (!currentTask) return;
+      const task = tasks.find((t) => t._id === taskId);
+      if (!task) {
+        console.error("Task not found");
+        return;
+      }
+  
+      setCurrentTask(task);
+      setCommentModalVisible(true);
+  
       const sessionId = await AsyncStorage.getItem("sessionId");
-      const response = await fetch(
-        `${main_uri}comment/all/${currentTask._id}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${sessionId}`,
-          },
-        }
-      );
+      const response = await fetch(`${server}comment/all/${taskId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionId}`,
+        },
+      });
+  
       if (!response.ok) throw new Error("Failed to fetch comments");
+  
       const data = await response.json();
-      setComments(data);
-      console.log(data)
+      // setComments(data);
+      setComments([...data].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
     } catch (error) {
       console.error("Error fetching comments:", error);
       alert("Failed to fetch comments");
     }
   };
+  
 
-
-  const addComment = async () => 
-  {
-    try{
-      if (!newComment.user || !newComment.text || !currentTask) return;
+  const addComment = async () => {
+    try {
+      if (!newComment || !currentTask) return;
+  
       const comment = {
         projectId: id,
-        content: newComment.text,
+        content: newComment,
         taskId: currentTask._id,
       };
-
+  
       const sessionId = await AsyncStorage.getItem("sessionId");
       if (!sessionId) {
         alert("Please login to add a comment");
         return router.push("/login");
       }
-      const response = await fetch(main_uri + "comment/create", {
+  
+      const response = await fetch(server + "comment/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -175,20 +180,24 @@ export default function CommentSection() {
         },
         body: JSON.stringify(comment),
       });
+  
       if (!response.ok) throw new Error("Failed to add comment");
-
+  
       const createdComment = await response.json();
-      console.log(createdComment)
-      setComments([...comments, createdComment]);
-      setNewComment("");
-    }
-    catch (error) {
+      console.log("Comment added:", createdComment.response);
+  
+      if (createdComment && createdComment.response._id) {
+        await fetchComments(currentTask._id); // No need to setComments([]) beforehand
+        setNewComment(""); // Reset input
+      }
+    } catch (error) {
       console.error("Error adding comment:", error);
       alert("Failed to add comment");
-    } finally {
-      setCurrentTask(null);
     }
-  }
+  };
+  
+
+
   const onChangeDate = (event, selectedDate) => {
     setShowDatePicker(false);
     if (selectedDate) setDate(selectedDate);
@@ -205,13 +214,18 @@ export default function CommentSection() {
         <TouchableOpacity onPress={() => router.push("/homepage")}>
           <ArrowLeft stroke="#ffffff" width={28} height={28} />
         </TouchableOpacity>
+          <TouchableOpacity onPress={() =>router.push("/connections")}>
+          <UserPlus stroke="#ffffff" width={28} height={28} />
+          </TouchableOpacity>
       </View>
       <View style={styles.navSeparator} />
 
       {/* Project Header */}
       <View style={styles.projectHeader}>
         <Text style={styles.projectTitle}>
-          {project ? `Project: ${project.projectName}` : "Loading..."}
+          {/* {project ? `Project: ${project.projectName}` : "Loading..."} */}
+          {project ? `Project: ${project.projectName}` : count}
+
         </Text>
         {project && (
           <Text style={styles.projectDescription}>
@@ -252,10 +266,8 @@ export default function CommentSection() {
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.items}
-                onPress={async () => {
-                  await setCurrentTask(task);
-                  await fetchComments()
-                  setCommentModalVisible(true);
+                onPress={() => {
+                  fetchComments(task._id)
                 }}
               >
                 <MessageCircle stroke="gray" width={24} height={24} />
@@ -339,9 +351,9 @@ export default function CommentSection() {
             /> */}
             <TextInput
               placeholder="Share Your Idea"
-              value={newComment.text}
+              value={newComment}
               onChangeText={(text) =>
-                setNewComment({ ...newComment, text: text })
+                setNewComment(text)
               }
               style={styles.input}
             />

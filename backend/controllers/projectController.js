@@ -22,7 +22,12 @@ const listProjects = async (req,res) => {
 
 const createProject = async (req, res) => {
     const { projectName, projectDescription, projectStatus} = req.body;
-    const { userId } = req.params;
+
+    const user = verifyToken(req, res);
+    const userId = user.id;
+    if (!userId) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
 
     if (!projectName || !projectDescription || !projectStatus ) {
         return res.status(400).json({ message: 'Please fill all fields' });

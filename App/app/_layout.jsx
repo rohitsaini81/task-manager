@@ -30,7 +30,16 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack screenOptions={{ headerShown: false }} />
+      <Stack 
+      // screenOptions={{ headerShown: false }}
+      screenOptions={{
+        animation: 'slide_from_right', 
+        gestureEnabled: true,
+        headerShown: false, 
+      }}
+      
+      
+      />
       <StatusBar style="auto" />
     </ThemeProvider>
   );

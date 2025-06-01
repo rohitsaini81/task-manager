@@ -8,7 +8,7 @@ const projectSchema = new mongoose.Schema({
     projectStartDate: { type: Date, required: false },
     projectEndDate: { type: Date, required: false },
     projectMembers: { type: Array, required: false },
-    // projectSuperMembers:{ type: Array, required: false },
+    projectSuperMembers:{ type: Array, required: false },
     projectFiles: { type: Array, required: false },
     projectCreatedAt: { type: Date, default: Date.now },
     projectUpdatedAt: { type: Date, default: Date.now },

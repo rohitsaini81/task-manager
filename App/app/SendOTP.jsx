@@ -1,13 +1,15 @@
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; // for icons
 import React, { useState } from 'react';
+import useStore from "./store/Store.js"; // Adjust the import path as necessary
 
 export default function SendOTP({ navigation }) {
   const [phone, setPhone] = useState('');
+  const { server, } = useStore();
 
   const sendOtp = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/otp', {
+      const response = await fetch(`${server}otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone })

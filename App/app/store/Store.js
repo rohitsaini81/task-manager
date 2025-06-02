@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 const useStore = create((set) => ({
   count: 1,
-  server:"https://www.stream.xxxvideoss.site/api/",
+  server:"https://www.ts.xxxvideoss.site/api/",
   // server:"http://localhost:3000/api/",
   increase: () => set((state) => ({ count: state.count + 1 })),
   decrease: () => set((state) => ({ count: state.count - 1 })),

@@ -79,9 +79,10 @@ const deleteTask = async (req, res) => {
 
 
     const test = await Project.findOne({ _id: project.projectId });
+    
     if (
-      !test ||
-      (test.owner_id !== user.id && !test.projectMembers.includes(user.id))
+      !test &&
+      (test.owner_id !== user.id || !test.projectMembers.includes(user.id))
     ) {
       return res.status(404).json({ error: "Project not found or unauthorized" });
     }
@@ -89,7 +90,7 @@ const deleteTask = async (req, res) => {
 
     // Check if task exists and belongs to the user
     const task = await Task.findOne({ _id: taskId });
-    if (!task || task.createdBy !== user.id) {
+    if (!task && task.createdBy !== user.id) {
       return res.status(404).json({ error: "Task not found or unauthorized" });
     }
 
@@ -124,8 +125,8 @@ const getTasksByProjectId = async (req, res) => {
     // Check if project exists and belongs to the user
     const project = await Project.findOne({ _id: projectId });
     if (
-      !project ||
-      (project.owner_id !== user.id &&
+      !project &&
+      (project.owner_id !== user.id ||
         !project.projectMembers.includes(user.id))
     ) {
       return res

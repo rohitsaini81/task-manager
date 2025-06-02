@@ -226,7 +226,7 @@ export default function Homepage() {
                 <TouchableOpacity
                   onPress={() => router.push(`/project/${project.id}`)}
                 >
-                  {" "}
+                  {<Text></Text>}
                   <Text style={styles.cardTitle}>{project.title}</Text>
                 </TouchableOpacity>
 

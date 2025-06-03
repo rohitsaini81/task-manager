@@ -188,7 +188,7 @@ export default function Homepage() {
         {/* Navbar */}
         <View style={styles.navbar}>
           <TouchableOpacity onPress={toggleMenu}>
-            <Menu stroke="#ffffff" width={28} height={28} />
+          <Menu stroke="#ffffff" width={28} height={28} />
           </TouchableOpacity>
           <TouchableOpacity>
             <Image
@@ -200,7 +200,6 @@ export default function Homepage() {
           </TouchableOpacity>
         </View>
         <View style={styles.navSeparator} />
-
         {/* Sliding Menu */}
         <Animated.View
           style={[styles.sideMenu, { transform: [{ translateX: slideAnim }] }]}
@@ -214,10 +213,8 @@ export default function Homepage() {
             Logout
           </Text>
         </Animated.View>
-
         {/* Title */}
         <Text style={styles.title}>Projects</Text>
-
         {/* Projects List */}
         <ScrollView contentContainerStyle={styles.projectList}>
           {projectList.map((project) => (
@@ -229,7 +226,6 @@ export default function Homepage() {
                   {<Text></Text>}
                   <Text style={styles.cardTitle}>{project.title}</Text>
                 </TouchableOpacity>
-
                 <TouchableOpacity
                   style={styles.moreButton}
                   onPress={() => toggleProjectMenu(project.id)}
@@ -253,25 +249,20 @@ export default function Homepage() {
             </View>
           ))}
         </ScrollView>
-
         {/* Floating Action Button */}
         <TouchableOpacity
           style={styles.fab}
-          onPress={() => setModalVisible(true)}
-        >
+          onPress={() => setModalVisible(true)}>
           <Plus stroke="white" width={28} height={28} />
         </TouchableOpacity>
-
         {/* Modal for Adding Project */}
         <Modal
           visible={isModalVisible}
           animationType="slide"
-          transparent={true}
-        >
+          transparent={true}>
           <View style={styles.modalOverlay}>
             <View style={styles.modalContainer}>
               <Text style={styles.modalTitle}>Add New Project</Text>
-
               <TextInput
                 placeholder="Project Title"
                 value={newProject.title}
@@ -280,7 +271,6 @@ export default function Homepage() {
                 }
                 style={styles.input}
               />
-
               <TextInput
                 placeholder="Project Description"
                 value={newProject.description}
@@ -288,15 +278,13 @@ export default function Homepage() {
                   setNewProject({ ...newProject, description: text })
                 }
                 style={styles.input}
-                multiline
-              />
+                multiline/>
               <TouchableOpacity style={styles.addButton} onPress={addProject}>
                 <Text style={styles.addButtonText}>Add Project</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => setModalVisible(false)}
-                style={styles.closeButton}
-              >
+                style={styles.closeButton}>
                 <Text style={styles.closeButtonText}>Cancel</Text>
               </TouchableOpacity>
             </View>

@@ -18,7 +18,7 @@ import useStore from "../store/Store.js"; // Adjust the import path as necessary
 
 export default function Homepage() {
   const projects = [];
-  const { server, count, increase, decrease, reset } = useStore();
+  const { server } = useStore();
 
   const getProjects = async () => {
     try {

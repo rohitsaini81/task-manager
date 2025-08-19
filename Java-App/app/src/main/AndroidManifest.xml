@@ -25,6 +25,7 @@
         <activity android:name=".LoginActivity" />
         <activity android:name=".SignUpActivity" />
         <activity android:name=".VerifyOtpActivity" />
+        <activity android:name=".home.HomeActivity" />
 
 
     </application>

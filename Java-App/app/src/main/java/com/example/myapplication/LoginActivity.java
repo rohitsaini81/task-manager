@@ -12,6 +12,9 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+
+import com.example.myapplication.home.HomeActivity;
+
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -52,8 +55,8 @@ public class LoginActivity extends AppCompatActivity {
                 Toast.makeText(this, "Password length must be between 6 to 16 characters.", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "Please Wait! " + phoneNumber, Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(LoginActivity.this, ViewProjectActivity.class);
-                startActivity(intent);
+//                Intent intent = new Intent(LoginActivity.this, ViewProjectActivity.class);
+//                startActivity(intent);
                 new Thread(() -> {
                     String response = null;
                     response = ApiClient.postLogin("+91"+phoneNumber,userPasswd,server_url+"api/auth/login");
@@ -74,13 +77,12 @@ public class LoginActivity extends AppCompatActivity {
                             editor.apply(); // or commit()
 
                             Toast.makeText(LoginActivity.this, finalResponse, Toast.LENGTH_LONG).show();
-//                            Intent intent = new Intent(LoginActivity.this, ViewProjectActivity.class);
-//                            startActivity(intent);
+                            Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                            startActivity(intent);
                         }
                     });
 
-                });
-//                        .start();
+                }).start();
 
             }
         });

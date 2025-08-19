@@ -18,9 +18,12 @@ import android.widget.PopupMenu;
 import android.widget.PopupWindow;
 import android.widget.Toast;
 
+import com.example.myapplication.home.HomeActivity;
+
 public class MainActivity extends AppCompatActivity {
 //  static variables
-    public static String server_url="http://192.168.1.25:3000/";
+//  public static String server_url="http://192.168.1.25:3000/";
+    public static String server_url="http://10.50.171.25:3000/";
 
 
     EditText inputField;
@@ -92,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
          btnSignUp.setOnClickListener( v->{
-             Intent intent = new Intent(MainActivity.this, SignUpActivity.class);
+             Intent intent = new Intent(MainActivity.this, HomeActivity.class);
              startActivity(intent);
 
          });

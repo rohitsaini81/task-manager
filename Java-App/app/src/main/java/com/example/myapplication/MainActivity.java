@@ -42,6 +42,15 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences sharedPreferences = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
         String sessionId = sharedPreferences.getString("session_id", null);
+        if (sessionId != null) {
+            // User is logged in
+//            Toast.makeText(this,"You are  Logged In",Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+            startActivity(intent);
+
+        }
+
+
 // popup test ----->
         final PopupMenu popupMenu= new PopupMenu(this,btnViewProjects);
         popupMenu.getMenu().add(Menu.NONE,0,0,"turn on internet");
@@ -79,12 +88,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         //  end function
-        if (sessionId != null) {
-            // User is logged in
-            Toast.makeText(this,"You are Already Logged In",Toast.LENGTH_SHORT).show();
-        } else {
-            // Session expired or user not logged in
-        }
+
 
 //        // Set up click listeners
 
@@ -95,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
          btnSignUp.setOnClickListener( v->{
-             Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+             Intent intent = new Intent(MainActivity.this, SignUpActivity.class);
              startActivity(intent);
 
          });

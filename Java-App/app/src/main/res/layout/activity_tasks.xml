@@ -24,9 +24,9 @@
             android:adjustViewBounds="true"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Menu"
+            android:onClick="goBack"
             android:scaleType="centerInside"
-            android:scaleX="-1"
-            android:src="@drawable/menu" />
+            android:src="@drawable/larrow" />
 
 
         <View
@@ -40,7 +40,7 @@
             android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Profile"
-            app:srcCompat="@drawable/pfp" />
+            app:srcCompat="@drawable/member" />
     </LinearLayout>
 
     <!-- Vertical List -->

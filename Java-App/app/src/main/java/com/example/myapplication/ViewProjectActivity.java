@@ -9,6 +9,6 @@ public class ViewProjectActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstance){
         super.onCreate(savedInstance);
-        setContentView(R.layout.activity_view_project);
+        setContentView(R.layout.activity_tasks);
     }
 }
